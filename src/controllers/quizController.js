@@ -16,102 +16,157 @@ const questions = [
     { id: 10, question: 'How often do you get health checkups?', options: ['Never', 'Rarely', 'Annually', 'Regularly'], scores: [15, 10, 5, 0] }
 ];
 
-// Show quiz start page
-exports.start = (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
-    res.render('quiz/start', { title: 'Health Habits Quiz', user: req.session.user, error: null });
+// ===== SHOW QUIZ START PAGE =====
+const start = (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+    res.render('quiz/start', { 
+        title: 'Health Habits Quiz', 
+        user: req.session.user, 
+        error: null 
+    });
 };
 
-// Show question by index (step)
-exports.question = (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
+// ===== SHOW QUESTION BY STEP =====
+const question = (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
     const step = parseInt(req.params.step) || 0;
     if (step >= questions.length) {
         return res.redirect('/quiz/result');
     }
     const q = questions[step];
-    res.render('quiz/question', { title: 'Quiz', user: req.session.user, question: q, step, total: questions.length, error: null });
+    res.render('quiz/question', { 
+        title: 'Quiz', 
+        user: req.session.user, 
+        question: q, 
+        step, 
+        total: questions.length, 
+        error: null 
+    });
 };
 
-// Process answer
-exports.answer = async (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
-    const { step, answer } = req.body;
-    const currentStep = parseInt(step);
-    // Store answers in session (temporary)
-    if (!req.session.quizAnswers) req.session.quizAnswers = [];
-    req.session.quizAnswers[currentStep] = parseInt(answer);
-    // Redirect to next question or result
-    if (currentStep + 1 < questions.length) {
-        res.redirect(`/quiz/question/${currentStep + 1}`);
-    } else {
-        // Calculate total score
-        let total = 0;
-        req.session.quizAnswers.forEach((selected, idx) => {
-            const q = questions[idx];
-            total += q.scores[selected] || 0;
-        });
-        // Normalize to 0-100
-        const maxPossible = questions.reduce((sum, q) => sum + Math.max(...q.scores), 0);
-        const healthScore = Math.round((total / maxPossible) * 100);
-        // Save to database
-        await QuizResult.create({
-            user_id: req.session.user.id,
-            health_score: healthScore,
-            answers: JSON.stringify(req.session.quizAnswers)
-        });
-        // Update risk profile based on health score (inverse relation: higher health score => lower risk)
-        const user = await User.findByPk(req.session.user.id);
-        const bmi = user.bmi || 22;
-        const age = user.age || 30;
-        const smoking = user.smoking || false;
-        // Recalculate risk with new health factor
-        let riskScore = 0;
-        if (age < 25) riskScore += 10;
-        else if (age < 35) riskScore += 20;
-        else if (age < 50) riskScore += 35;
-        else riskScore += 50;
-        if (bmi < 18.5) riskScore += 15;
-        else if (bmi < 25) riskScore += 5;
-        else if (bmi < 30) riskScore += 25;
-        else riskScore += 40;
-        if (smoking) riskScore += 30;
-        // Health score adjustment: lower health score increases risk
-        const healthFactor = Math.max(0, (100 - healthScore) / 2); // 0 to 50 points
-        riskScore += Math.round(healthFactor);
-        // Cap at 100
-        riskScore = Math.min(100, riskScore);
-        const premium = 50 + (riskScore * 1.5);
-        // Save new risk profile
-        await RiskProfile.create({
-            user_id: req.session.user.id,
-            risk_score: riskScore,
-            premium: Math.round(premium * 100) / 100,
-            age,
-            bmi,
-            smoking
-        });
-        // Clear session answers
-        delete req.session.quizAnswers;
-        // Redirect to result
-        res.redirect(`/quiz/result?score=${healthScore}`);
+// ===== PROCESS ANSWER =====
+const answer = async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+    
+    try {
+        const { step, answer } = req.body;
+        const currentStep = parseInt(step);
+        
+        // Store answers in session (temporary)
+        if (!req.session.quizAnswers) {
+            req.session.quizAnswers = [];
+        }
+        req.session.quizAnswers[currentStep] = parseInt(answer);
+        
+        // Redirect to next question or result
+        if (currentStep + 1 < questions.length) {
+            res.redirect(`/quiz/question/${currentStep + 1}`);
+        } else {
+            // Calculate total score
+            let total = 0;
+            req.session.quizAnswers.forEach((selected, idx) => {
+                const q = questions[idx];
+                if (selected !== undefined && q.scores[selected] !== undefined) {
+                    total += q.scores[selected] || 0;
+                }
+            });
+            
+            // Normalize to 0-100
+            const maxPossible = questions.reduce((sum, q) => sum + Math.max(...q.scores), 0);
+            const healthScore = Math.round((total / maxPossible) * 100);
+            
+            // Save to database
+            await QuizResult.create({
+                user_id: req.session.user.id,
+                health_score: healthScore,
+                answers: JSON.stringify(req.session.quizAnswers)
+            });
+            
+            // Update risk profile based on health score
+            const user = await User.findByPk(req.session.user.id);
+            const bmi = user.bmi || 22;
+            const age = user.age || 30;
+            const smoking = user.smoking || false;
+            
+            // Recalculate risk with new health factor
+            let riskScore = 0;
+            if (age < 25) riskScore += 10;
+            else if (age < 35) riskScore += 20;
+            else if (age < 50) riskScore += 35;
+            else riskScore += 50;
+            
+            if (bmi < 18.5) riskScore += 15;
+            else if (bmi < 25) riskScore += 5;
+            else if (bmi < 30) riskScore += 25;
+            else riskScore += 40;
+            
+            if (smoking) riskScore += 30;
+            
+            // Health score adjustment: lower health score increases risk
+            const healthFactor = Math.max(0, (100 - healthScore) / 2); // 0 to 50 points
+            riskScore += Math.round(healthFactor);
+            riskScore = Math.min(100, riskScore);
+            
+            const premium = 50 + (riskScore * 1.5);
+            
+            // Save new risk profile
+            await RiskProfile.create({
+                user_id: req.session.user.id,
+                risk_score: riskScore,
+                premium: Math.round(premium * 100) / 100,
+                age,
+                bmi,
+                smoking
+            });
+            
+            // Clear session answers
+            delete req.session.quizAnswers;
+            
+            // Redirect to result
+            res.redirect(`/quiz/result?score=${healthScore}`);
+        }
+    } catch (err) {
+        console.error('Quiz answer error:', err);
+        res.status(500).send('Error processing quiz answer');
     }
 };
 
-// Show result
-exports.result = async (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
-    const score = parseInt(req.query.score) || 0;
-    const latestResult = await QuizResult.findOne({
-        where: { user_id: req.session.user.id },
-        order: [['completed_at', 'DESC']]
-    });
-    res.render('quiz/result', {
-        title: 'Quiz Result',
-        user: req.session.user,
-        score: latestResult ? latestResult.health_score : score,
-        error: null
-    });
+// ===== SHOW QUIZ RESULT =====
+const result = async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+    
+    try {
+        const score = parseInt(req.query.score) || 0;
+        const latestResult = await QuizResult.findOne({
+            where: { user_id: req.session.user.id },
+            order: [['completed_at', 'DESC']]
+        });
+        
+        res.render('quiz/result', {
+            title: 'Quiz Result',
+            user: req.session.user,
+            score: latestResult ? latestResult.health_score : score,
+            error: null
+        });
+    } catch (err) {
+        console.error('Quiz result error:', err);
+        res.status(500).send('Error loading quiz result');
+    }
 };
 
-module.exports = { questions, start, question, answer, result };
+// ===== EXPORT ALL =====
+module.exports = { 
+    questions, 
+    start, 
+    question, 
+    answer, 
+    result 
+};

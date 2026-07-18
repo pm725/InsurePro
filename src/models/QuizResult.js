@@ -16,7 +16,7 @@ const QuizResult = sequelize.define('QuizResult', {
         defaultValue: 0
     },
     answers: {
-        type: DataTypes.TEXT,  // JSON string
+        type: DataTypes.TEXT,
         allowNull: true
     },
     completed_at: {
@@ -25,7 +25,9 @@ const QuizResult = sequelize.define('QuizResult', {
     }
 }, {
     tableName: 'quiz_results',
-    timestamps: false
+    timestamps: false,
+    createdAt: false,
+    updatedAt: false
 });
 
 module.exports = QuizResult;
