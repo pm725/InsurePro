@@ -13,6 +13,7 @@ const claimRoutes = require('./routes/claimRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const communityRoutes = require('./routes/communityRoutes');
+const infoRoutes = require('./routes/infoRoutes');
 
 // View engine
 app.set('view engine', 'ejs');
@@ -25,6 +26,7 @@ app.use(express.static('public'));
 app.use('/', adminRoutes);
 app.use('/', quizRoutes);
 app.use('/', communityRoutes);
+app.use('/', infoRoutes);
 
 
 app.use('/uploads', express.static('uploads'));

@@ -1,0 +1,143 @@
+<%- include('../partials/header', { title: 'Health Metrics Glossary' }) %>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/info">Info Hub</a></li>
+                <li class="breadcrumb-item active">Glossary</li>
+            </ol>
+        </nav>
+
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-book text-info"></i> Health Metrics Glossary</h4>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="glossaryAccordion">
+
+                    <!-- BMI -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBMI">
+                                <strong>BMI (Body Mass Index)</strong>
+                            </button>
+                        </h2>
+                        <div id="collapseBMI" class="accordion-collapse collapse show" data-bs-parent="#glossaryAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Definition:</strong> A measure of body fat based on height and weight.</p>
+                                <p><strong>Formula:</strong> weight (kg) / height (m)²</p>
+                                <p><strong>Categories:</strong> Underweight (&lt;18.5), Normal (18.5-24.9), Overweight (25-29.9), Obese (≥30)</p>
+                                <p><strong>Impact on Risk Score:</strong> +5 to +40 points depending on category</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Score -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRisk">
+                                <strong>Risk Score</strong>
+                            </button>
+                        </h2>
+                        <div id="collapseRisk" class="accordion-collapse collapse" data-bs-parent="#glossaryAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Definition:</strong> A number from 0-100 predicting health insurance risk.</p>
+                                <p><strong>Formula:</strong> Age Points + BMI Points + Smoking Points + Health Factor</p>
+                                <p><strong>Categories:</strong> Low (0-40), Medium (41-70), High (71-100)</p>
+                                <p><strong>Impact on Premium:</strong> Higher risk = higher premium</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Premium -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePremium">
+                                <strong>Premium</strong>
+                            </button>
+                        </h2>
+                        <div id="collapsePremium" class="accordion-collapse collapse" data-bs-parent="#glossaryAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Definition:</strong> Monthly amount paid for health insurance coverage.</p>
+                                <p><strong>Formula:</strong> $50 + (Risk Score × $1.50)</p>
+                                <p><strong>Range:</strong> $50 (minimum) to $200+ (maximum)</p>
+                                <p><strong>How to Reduce:</strong> Lower your risk score by improving health habits</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Health Score -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHealth">
+                                <strong>Health Score</strong>
+                            </button>
+                        </h2>
+                        <div id="collapseHealth" class="accordion-collapse collapse" data-bs-parent="#glossaryAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Definition:</strong> A score from 0-100 measuring lifestyle habits.</p>
+                                <p><strong>Formula:</strong> Based on 10-question Health Habits Quiz</p>
+                                <p><strong>Categories:</strong> Excellent (80-100), Good (60-79), Needs Improvement (0-59)</p>
+                                <p><strong>Impact on Risk Score:</strong> Higher health score = lower risk</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseQuiz">
+                                <strong>Health Habits Quiz</strong>
+                            </button>
+                        </h2>
+                        <div id="collapseQuiz" class="accordion-collapse collapse" data-bs-parent="#glossaryAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Definition:</strong> A 10-question assessment covering lifestyle factors.</p>
+                                <p><strong>Factors:</strong> Exercise, Sleep, Diet, Alcohol, Stress, Smoking, Fast Food, Water, Chronic Conditions, Checkups</p>
+                                <p><strong>Result:</strong> Generates your Health Score and updates your risk profile</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Claim -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseClaim">
+                                <strong>Insurance Claim</strong>
+                            </button>
+                        </h2>
+                        <div id="collapseClaim" class="accordion-collapse collapse" data-bs-parent="#glossaryAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Definition:</strong> A formal request to your insurance provider for coverage of medical expenses.</p>
+                                <p><strong>Statuses:</strong> Pending (reviewing), Approved (accepted), Rejected (denied)</p>
+                                <p><strong>Documents:</strong> Supporting files (images, PDFs) to verify your claim</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Community Tips -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTip">
+                                <strong>Community Tips</strong>
+                            </button>
+                        </h2>
+                        <div id="collapseTip" class="accordion-collapse collapse" data-bs-parent="#glossaryAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Definition:</strong> Health tips shared by the InsurePro community.</p>
+                                <p><strong>Features:</strong> Post, Upvote/Like, Comment, Share</p>
+                                <p><strong>Purpose:</strong> Learn from others and share your health knowledge</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <a href="/info" class="btn btn-primary mt-4"><i class="fas fa-arrow-left"></i> Back to Info Hub</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

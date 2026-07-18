@@ -1,0 +1,95 @@
+<%- include('../partials/header', { title: 'Risk Score Explained' }) %>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/info">Info Hub</a></li>
+                <li class="breadcrumb-item active">Risk Score</li>
+            </ol>
+        </nav>
+
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-chart-line text-danger"></i> Risk Score Explained</h4>
+            </div>
+            <div class="card-body">
+                <h5>What is a Risk Score?</h5>
+                <p>
+                    <strong>Risk Score</strong> is a number from <strong>0 to 100</strong> that predicts your
+                    health insurance risk. A higher score means higher risk, which leads to higher monthly premiums.
+                </p>
+
+                <h5 class="mt-4">How is Risk Score Calculated?</h5>
+                <p>Your risk score is calculated using multiple factors:</p>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr><th>Factor</th><th>Condition</th><th>Points Added</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="4"><strong>Age</strong></td>
+                            <td>Under 25</td>
+                            <td>+10</td>
+                        </tr>
+                        <tr><td>25-34</td><td>+20</td></tr>
+                        <tr><td>35-49</td><td>+35</td></tr>
+                        <tr><td>50+</td><td>+50</td></tr>
+                        <tr>
+                            <td rowspan="4"><strong>BMI</strong></td>
+                            <td>Under 18.5 (Underweight)</td>
+                            <td>+15</td>
+                        </tr>
+                        <tr><td>18.5-24.9 (Normal)</td><td>+5</td></tr>
+                        <tr><td>25-29.9 (Overweight)</td><td>+25</td></tr>
+                        <tr><td>30+ (Obese)</td><td>+40</td></tr>
+                        <tr>
+                            <td><strong>Smoking</strong></td>
+                            <td>Yes</td>
+                            <td>+30</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Health Score</strong></td>
+                            <td>Lower health score = More risk</td>
+                            <td>0-50 additional points</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info">
+                    <strong>Formula:</strong> Risk Score = Age Points + BMI Points + Smoking Points + Health Factor
+                </div>
+
+                <h5 class="mt-4">Risk Score Categories</h5>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="alert alert-success">
+                            <h3>0-40</h3>
+                            <strong>Low Risk</strong>
+                            <p>Healthy profile</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="alert alert-warning">
+                            <h3>41-70</h3>
+                            <strong>Medium Risk</strong>
+                            <p>Some risk factors</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="alert alert-danger">
+                            <h3>71-100</h3>
+                            <strong>High Risk</strong>
+                            <p>Multiple risk factors</p>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/info" class="btn btn-primary mt-3"><i class="fas fa-arrow-left"></i> Back to Info Hub</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

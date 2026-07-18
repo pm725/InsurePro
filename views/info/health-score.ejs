@@ -1,0 +1,92 @@
+<%- include('../partials/header', { title: 'Health Score Explained' }) %>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/info">Info Hub</a></li>
+                <li class="breadcrumb-item active">Health Score</li>
+            </ol>
+        </nav>
+
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-heart text-warning"></i> Health Score Explained</h4>
+            </div>
+            <div class="card-body">
+                <h5>What is a Health Score?</h5>
+                <p>
+                    <strong>Health Score</strong> is a number from <strong>0 to 100</strong> that measures your
+                    overall lifestyle and habits. Higher scores indicate healthier habits.
+                </p>
+
+                <h5 class="mt-4">How is Health Score Calculated?</h5>
+                <p>
+                    Your health score is based on answers from the <strong>Health Habits Quiz</strong>
+                    covering 10 lifestyle factors:
+                </p>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr><th>Question</th><th>Score Impact</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Exercise frequency</td><td>0-20 points</td></tr>
+                        <tr><td>Sleep duration</td><td>0-20 points</td></tr>
+                        <tr><td>Diet quality</td><td>0-25 points</td></tr>
+                        <tr><td>Alcohol consumption</td><td>0-25 points</td></tr>
+                        <tr><td>Stress level</td><td>0-20 points</td></tr>
+                        <tr><td>Smoking/Tobacco use</td><td>0-30 points</td></tr>
+                        <tr><td>Fast food frequency</td><td>0-20 points</td></tr>
+                        <tr><td>Water intake</td><td>0-15 points</td></tr>
+                        <tr><td>Chronic conditions</td><td>0-20 points</td></tr>
+                        <tr><td>Health checkup frequency</td><td>0-15 points</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info">
+                    <strong>Formula:</strong> Health Score = (Total Points / Max Possible Points) × 100
+                </div>
+
+                <h5 class="mt-4">Health Score Categories</h5>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="alert alert-success">
+                            <h3>80-100</h3>
+                            <strong>Excellent</strong>
+                            <p>Very healthy lifestyle</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="alert alert-warning">
+                            <h3>60-79</h3>
+                            <strong>Good</strong>
+                            <p>Healthy habits</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="alert alert-danger">
+                            <h3>0-59</h3>
+                            <strong>Needs Improvement</strong>
+                            <p>Some habits need work</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>How Health Score Affects You:</strong>
+                    <ul>
+                        <li>Higher health score → Lower risk score → Lower premium</li>
+                        <li>Take the quiz to discover your health score</li>
+                        <li>Track your progress over time</li>
+                    </ul>
+                </div>
+
+                <a href="/info" class="btn btn-primary mt-3"><i class="fas fa-arrow-left"></i> Back to Info Hub</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
