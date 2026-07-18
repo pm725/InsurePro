@@ -124,7 +124,7 @@
                                             <%= claim.status %>
                                         </span>
                                     </td>
-                                    <td><%= claim.createdAt.toLocaleDateString() %></td>
+                                    <td><%= claim.createdAt ? new Date(claim.createdAt).toLocaleDateString() : 'N/A' %></td>
                                 </tr>
                             <% }) %>
                         </tbody>
