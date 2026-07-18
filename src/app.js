@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Import routes
+// ===== IMPORT ROUTES =====
 const authRoutes = require('./routes/authRoutes');
 const riskRoutes = require('./routes/riskRoutes');
 const claimRoutes = require('./routes/claimRoutes');
@@ -15,29 +15,17 @@ const quizRoutes = require('./routes/quizRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const infoRoutes = require('./routes/infoRoutes');
 
-// View engine
+// ===== VIEW ENGINE =====
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
-// Middleware
+// ===== MIDDLEWARE (ORDER MATTERS!) =====
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use('/', adminRoutes);
-app.use('/', quizRoutes);
-app.use('/', communityRoutes);
-app.use('/', infoRoutes);
-
-
 app.use('/uploads', express.static('uploads'));
 
-// Create uploads directory if it doesn't exist
-const fs = require('fs');
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-}
-
-// Session
+// ✅ SESSION MUST COME BEFORE ROUTES
 app.use(session({
     secret: process.env.SESSION_SECRET || 'default-secret-key',
     resave: false,
@@ -47,20 +35,24 @@ app.use(session({
     }
 }));
 
-// Make user available in all views
+// ===== MAKE USER AVAILABLE IN ALL VIEWS =====
 app.use((req, res, next) => {
-    res.locals.user = req.session.user || null;
+    res.locals.user = req.session?.user || null;
     next();
 });
 
-// Routes
+// ===== ROUTES (AFTER SESSION) =====
 app.use('/', authRoutes);
 app.use('/', riskRoutes);
 app.use('/', claimRoutes);
+app.use('/', adminRoutes);        // ✅ Admin routes AFTER session
+app.use('/', quizRoutes);
+app.use('/', communityRoutes);
+app.use('/', infoRoutes);
 
-// Homepage
+// ===== HOMEPAGE =====
 app.get('/', (req, res) => {
-    if (req.session.user) {
+    if (req.session?.user) {
         return res.redirect('/dashboard');
     }
     res.render('index', { 
@@ -71,7 +63,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// Start server
+// ===== START SERVER =====
 app.listen(PORT, () => {
     console.log(`🚀 InsurePro running on http://localhost:${PORT}`);
     console.log(`📊 Dashboard: http://localhost:${PORT}/dashboard`);

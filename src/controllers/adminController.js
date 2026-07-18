@@ -1,23 +1,38 @@
 const User = require('../models/User');
 const Claim = require('../models/Claim');
 const RiskProfile = require('../models/RiskProfile');
-const QuizResult = require('../models/QuizResult');
 const sequelize = require('../config/db');
 
 // ===== ADMIN AUTH MIDDLEWARE =====
 const isAdmin = async (req, res, next) => {
+    // ✅ Check if session exists first
+    if (!req.session) {
+        console.log('❌ No session found');
+        return res.status(403).send('Session not found. Please login.');
+    }
+    
     if (!req.session.user) {
+        console.log('❌ User not logged in');
         return res.redirect('/login');
     }
+    
     try {
         const user = await User.findByPk(req.session.user.id);
+        if (!user) {
+            console.log('❌ User not found in database');
+            return res.status(403).send('User not found.');
+        }
+        
         // Check if user is admin (email contains 'admin' OR id === 1)
-        if (user && (user.email.includes('admin') || user.id === 1)) {
+        if (user.email.includes('admin') || user.id === 1) {
+            console.log('✅ Admin access granted for:', user.email);
             return next();
         }
+        
+        console.log('❌ Access denied for:', user.email);
         res.status(403).send('Access denied. Admins only.');
     } catch (err) {
-        console.error(err);
+        console.error('❌ Admin check error:', err);
         res.status(500).send('Error checking admin status');
     }
 };
@@ -108,7 +123,7 @@ const claims = async (req, res) => {
 const updateClaim = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body; // 'Approved' or 'Rejected'
+        const { status } = req.body;
         
         const claim = await Claim.findByPk(id);
         if (!claim) {
