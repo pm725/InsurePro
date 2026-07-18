@@ -1,0 +1,63 @@
+<%- include('../partials/header', { title: 'BMI Explained' }) %>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/info">Info Hub</a></li>
+                <li class="breadcrumb-item active">BMI</li>
+            </ol>
+        </nav>
+
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-weight text-primary"></i> Body Mass Index (BMI)</h4>
+            </div>
+            <div class="card-body">
+                <h5>What is BMI?</h5>
+                <p>
+                    <strong>BMI (Body Mass Index)</strong> is a measure of body fat based on your weight and height.
+                    It's widely used by health professionals to categorize weight status.
+                </p>
+
+                <h5 class="mt-4">How is BMI Calculated?</h5>
+                <div class="alert alert-info">
+                    <strong>Formula:</strong> BMI = weight (kg) / height (m)²
+                    <br>
+                    <small>Example: 70kg / (1.75m)² = 22.86</small>
+                </div>
+
+                <h5 class="mt-4">BMI Categories</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr><th>Category</th><th>BMI Range</th><th>Risk Impact</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="table-danger"><td>Underweight</td><td>&lt; 18.5</td><td>⚠️ +15 points</td></tr>
+                        <tr class="table-success"><td>Normal</td><td>18.5 – 24.9</td><td>✅ +5 points</td></tr>
+                        <tr class="table-warning"><td>Overweight</td><td>25 – 29.9</td><td>⚠️ +25 points</td></tr>
+                        <tr class="table-danger"><td>Obese</td><td>≥ 30</td><td>🚨 +40 points</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>How BMI affects your Risk Score:</strong> Higher BMI = Higher risk = Higher premium.
+                    Maintaining a healthy BMI (18.5-24.9) helps lower your insurance costs.
+                </div>
+
+                <h5 class="mt-4">Limitations of BMI</h5>
+                <ul>
+                    <li>Doesn't distinguish between muscle and fat</li>
+                    <li>May overestimate body fat in athletes</li>
+                    <li>May underestimate body fat in older adults</li>
+                    <li>Not a direct measure of health</li>
+                </ul>
+
+                <a href="/info" class="btn btn-primary mt-3"><i class="fas fa-arrow-left"></i> Back to Info Hub</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
