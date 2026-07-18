@@ -10,7 +10,9 @@ exports.showRiskForm = (req, res) => {
     res.render('risk-form', {
         title: 'Calculate Risk',
         user: req.session.user,
-        result: null
+        result: null,
+        error: null,      // ← ADD THIS
+        success: null     // ← ADD THIS
     });
 };
 
@@ -24,6 +26,17 @@ exports.calculateRisk = async (req, res) => {
         const ageNum = parseInt(age);
         const bmiNum = parseFloat(bmi);
         const smokingBool = smoking === 'on' || smoking === 'true';
+        
+        // Validation
+        if (!ageNum || !bmiNum) {
+            return res.render('risk-form', {
+                title: 'Calculate Risk',
+                user: req.session.user,
+                result: null,
+                error: 'Please fill in all fields correctly.',
+                success: null
+            });
+        }
         
         // Risk calculation algorithm
         let riskScore = 0;
@@ -86,7 +99,9 @@ exports.calculateRisk = async (req, res) => {
                 age: ageNum,
                 bmi: bmiNum,
                 smoking: smokingBool
-            }
+            },
+            error: null,
+            success: null
         });
         
     } catch (error) {
@@ -95,7 +110,8 @@ exports.calculateRisk = async (req, res) => {
             title: 'Calculate Risk',
             user: req.session.user,
             result: null,
-            error: 'Error calculating risk. Please try again.'
+            error: 'Error calculating risk. Please try again.',
+            success: null
         });
     }
 };
@@ -139,9 +155,9 @@ exports.showDashboard = async (req, res) => {
         
         // Format data for chart
         const chartData = riskHistory.map(r => ({
-            date: r.createdAt.toISOString().split('T')[0],
-            score: r.risk_score,
-            premium: parseFloat(r.premium)
+            date: r.createdAt ? r.createdAt.toISOString().split('T')[0] : 'N/A',
+            score: r.risk_score || 0,
+            premium: parseFloat(r.premium) || 0
         }));
         
         res.render('dashboard', {
@@ -149,9 +165,11 @@ exports.showDashboard = async (req, res) => {
             user: req.session.user,
             riskProfile: latestRisk,
             chartData: JSON.stringify(chartData),
-            claims,
-            claimsCount,
-            pendingClaims
+            claims: claims || [],
+            claimsCount: claimsCount || 0,
+            pendingClaims: pendingClaims || 0,
+            error: null,
+            success: null
         });
         
     } catch (error) {
