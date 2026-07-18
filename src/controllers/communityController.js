@@ -13,8 +13,8 @@ const tips = async (req, res) => {
         });
         res.render('community/tips', {
             title: 'Community Tips',
-            user: req.session.user,
-            tips: allTips,
+            user: req.session.user || null,
+            tips: allTips || [],
             error: null,
             success: null
         });
@@ -22,14 +22,13 @@ const tips = async (req, res) => {
         console.error('Error loading tips:', err);
         res.render('community/tips', {
             title: 'Community Tips',
-            user: req.session.user,
+            user: req.session.user || null,
             tips: [],
             error: 'Error loading tips. Please try again.',
             success: null
         });
     }
 };
-
 // ===== SHOW FORM TO CREATE A NEW TIP =====
 const newTipForm = (req, res) => {
     if (!req.session.user) {
@@ -50,6 +49,8 @@ const createTip = async (req, res) => {
     }
     try {
         const { title, content } = req.body;
+        
+        // Validation
         if (!title || !content) {
             return res.render('community/new-tip', {
                 title: 'Share a Health Tip',
@@ -58,13 +59,18 @@ const createTip = async (req, res) => {
                 success: null
             });
         }
+        
+        // Create tip
         await Tip.create({
             user_id: req.session.user.id,
-            title,
-            content,
+            title: title.trim(),
+            content: content.trim(),
             upvotes: 0
         });
+        
+        // ✅ Redirect with success
         res.redirect('/community/tips');
+        
     } catch (err) {
         console.error('Error creating tip:', err);
         res.render('community/new-tip', {

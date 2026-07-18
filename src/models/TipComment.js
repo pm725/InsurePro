@@ -25,5 +25,6 @@ const TipComment = sequelize.define('TipComment', {
     createdAt: 'created_at',
     updatedAt: false
 });
+TipComment.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = TipComment;

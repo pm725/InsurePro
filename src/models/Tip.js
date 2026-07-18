@@ -29,5 +29,6 @@ const Tip = sequelize.define('Tip', {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
+Tip.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Tip;

@@ -1,11 +1,15 @@
 const User = require('../models/User');
 const Claim = require('../models/Claim');
 const RiskProfile = require('../models/RiskProfile');
+const QuizResult = require('../models/QuizResult');
+const Tip = require('../models/Tip');
 const sequelize = require('../config/db');
 
-// ===== ADMIN AUTH MIDDLEWARE =====
+// ============================================
+// ADMIN AUTH MIDDLEWARE
+// ============================================
 const isAdmin = async (req, res, next) => {
-    // ✅ Check if session exists first
+    // Check if session exists
     if (!req.session) {
         console.log('❌ No session found');
         return res.status(403).send('Session not found. Please login.');
@@ -30,36 +34,63 @@ const isAdmin = async (req, res, next) => {
         }
         
         console.log('❌ Access denied for:', user.email);
-        res.status(403).send('Access denied. Admins only.');
+        return res.status(403).render('error', {
+            title: 'Access Denied',
+            user: req.session.user,
+            message: 'You do not have admin privileges.',
+            error: 'Only administrators can access this page.'
+        });
     } catch (err) {
         console.error('❌ Admin check error:', err);
         res.status(500).send('Error checking admin status');
     }
 };
 
-// ===== ADMIN DASHBOARD =====
+// ============================================
+// ADMIN DASHBOARD - Complete Overview
+// ============================================
 const dashboard = async (req, res) => {
     try {
+        // Stats
         const totalUsers = await User.count();
         const totalClaims = await Claim.count();
         const pendingClaims = await Claim.count({ where: { status: 'Pending' } });
+        const approvedClaims = await Claim.count({ where: { status: 'Approved' } });
+        const rejectedClaims = await Claim.count({ where: { status: 'Rejected' } });
+        const totalQuizzes = await QuizResult.count();
         
-        // Get average risk score
+        // Average risk score
         const avgRiskResult = await RiskProfile.findOne({
             attributes: [[sequelize.fn('AVG', sequelize.col('risk_score')), 'avgRisk']],
             raw: true
         });
         const avgRisk = avgRiskResult ? parseFloat(avgRiskResult.avgRisk) || 0 : 0;
         
+        // Average health score from quizzes
+        const avgHealthResult = await QuizResult.findOne({
+            attributes: [[sequelize.fn('AVG', sequelize.col('health_score')), 'avgHealth']],
+            raw: true
+        });
+        const avgHealth = avgHealthResult ? parseFloat(avgHealthResult.avgHealth) || 0 : 0;
+        
+        // Recent users
         const recentUsers = await User.findAll({
             limit: 5,
             order: [['createdAt', 'DESC']]
         });
         
+        // Recent claims with user info
         const recentClaims = await Claim.findAll({
             limit: 5,
             order: [['createdAt', 'DESC']],
-            include: [{ model: User, attributes: ['username'] }]
+            include: [{ model: User, attributes: ['username', 'email'] }]
+        });
+        
+        // Recent quiz results
+        const recentQuizzes = await QuizResult.findAll({
+            limit: 5,
+            order: [['completed_at', 'DESC']],
+            include: [{ model: User, attributes: ['username', 'email'] }]
         });
 
         res.render('admin/dashboard', {
@@ -68,9 +99,14 @@ const dashboard = async (req, res) => {
             totalUsers,
             totalClaims,
             pendingClaims,
+            approvedClaims,
+            rejectedClaims,
+            totalQuizzes,
             avgRisk: avgRisk.toFixed(1),
+            avgHealth: avgHealth.toFixed(1),
             recentUsers,
             recentClaims,
+            recentQuizzes,
             error: null,
             success: null
         });
@@ -80,7 +116,9 @@ const dashboard = async (req, res) => {
     }
 };
 
-// ===== VIEW ALL USERS =====
+// ============================================
+// MANAGE USERS
+// ============================================
 const users = async (req, res) => {
     try {
         const allUsers = await User.findAll({
@@ -99,7 +137,30 @@ const users = async (req, res) => {
     }
 };
 
-// ===== VIEW ALL CLAIMS (ADMIN) =====
+// ============================================
+// DELETE USER (with cascade)
+// ============================================
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Don't allow deleting yourself
+        if (parseInt(id) === req.session.user.id) {
+            return res.redirect('/admin/users?error=Cannot delete yourself');
+        }
+        
+        // Delete user (cascade will delete related records)
+        await User.destroy({ where: { id } });
+        res.redirect('/admin/users?success=User deleted successfully');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error deleting user');
+    }
+};
+
+// ============================================
+// MANAGE CLAIMS - View All
+// ============================================
 const claims = async (req, res) => {
     try {
         const allClaims = await Claim.findAll({
@@ -119,11 +180,13 @@ const claims = async (req, res) => {
     }
 };
 
-// ===== UPDATE CLAIM STATUS =====
+// ============================================
+// UPDATE CLAIM STATUS (Approve/Reject)
+// ============================================
 const updateClaim = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body;
+        const { status } = req.body; // 'Approved' or 'Rejected'
         
         const claim = await Claim.findByPk(id);
         if (!claim) {
@@ -132,31 +195,89 @@ const updateClaim = async (req, res) => {
         
         claim.status = status;
         await claim.save();
-        res.redirect('/admin/claims');
+        
+        console.log(`✅ Claim #${id} ${status} by admin`);
+        res.redirect('/admin/claims?success=Claim updated successfully');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error updating claim');
     }
 };
 
-// ===== DELETE USER =====
-const deleteUser = async (req, res) => {
+// ============================================
+// VIEW QUIZ RESULTS
+// ============================================
+const quizzes = async (req, res) => {
     try {
-        const { id } = req.params;
-        await User.destroy({ where: { id } });
-        res.redirect('/admin/users');
+        const allQuizzes = await QuizResult.findAll({
+            include: [{ model: User, attributes: ['username', 'email'] }],
+            order: [['completed_at', 'DESC']]
+        });
+        res.render('admin/quizzes', {
+            title: 'Quiz Results',
+            user: req.session.user,
+            quizzes: allQuizzes,
+            error: null,
+            success: null
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error deleting user');
+        res.status(500).send('Error loading quiz results');
     }
 };
 
-// ===== EXPORT ALL =====
+// ============================================
+// VIEW USER DETAILS (with all their data)
+// ============================================
+const userDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        
+        const riskProfiles = await RiskProfile.findAll({
+            where: { user_id: id },
+            order: [['createdAt', 'DESC']]
+        });
+        
+        const userClaims = await Claim.findAll({
+            where: { user_id: id },
+            order: [['createdAt', 'DESC']]
+        });
+        
+        const quizResults = await QuizResult.findAll({
+            where: { user_id: id },
+            order: [['completed_at', 'DESC']]
+        });
+        
+        res.render('admin/user-details', {
+            title: `User: ${user.username}`,
+            user: req.session.user,
+            targetUser: user,
+            riskProfiles,
+            userClaims,
+            quizResults,
+            error: null,
+            success: null
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error loading user details');
+    }
+};
+
+// ============================================
+// EXPORT ALL
+// ============================================
 module.exports = {
     isAdmin,
     dashboard,
     users,
+    deleteUser,
     claims,
     updateClaim,
-    deleteUser
+    quizzes,
+    userDetails
 };
