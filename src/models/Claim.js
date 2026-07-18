@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./User');
 
 const Claim = sequelize.define('Claim', {
     id: {
@@ -25,7 +26,12 @@ const Claim = sequelize.define('Claim', {
     }
 }, {
     tableName: 'claims',
-    timestamps: true
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
+
+// ✅ ADD THIS RELATIONSHIP
+Claim.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Claim;

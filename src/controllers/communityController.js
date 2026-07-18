@@ -4,12 +4,12 @@ const TipUpvote = require('../models/TipUpvote');
 const User = require('../models/User');
 const { Op } = require('sequelize');
 
-// Show all tips (feed)
-exports.tips = async (req, res) => {
+// ===== SHOW ALL TIPS (FEED) =====
+const tips = async (req, res) => {
     try {
         const allTips = await Tip.findAll({
             include: [{ model: User, attributes: ['username'] }],
-            order: [['createdAt', 'DESC']]
+            order: [['created_at', 'DESC']]
         });
         res.render('community/tips', {
             title: 'Community Tips',
@@ -19,14 +19,22 @@ exports.tips = async (req, res) => {
             success: null
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Error loading tips');
+        console.error('Error loading tips:', err);
+        res.render('community/tips', {
+            title: 'Community Tips',
+            user: req.session.user,
+            tips: [],
+            error: 'Error loading tips. Please try again.',
+            success: null
+        });
     }
 };
 
-// Show form to create a new tip
-exports.newTipForm = (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
+// ===== SHOW FORM TO CREATE A NEW TIP =====
+const newTipForm = (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
     res.render('community/new-tip', {
         title: 'Share a Health Tip',
         user: req.session.user,
@@ -35,9 +43,11 @@ exports.newTipForm = (req, res) => {
     });
 };
 
-// Submit a new tip
-exports.createTip = async (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
+// ===== SUBMIT A NEW TIP =====
+const createTip = async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
     try {
         const { title, content } = req.body;
         if (!title || !content) {
@@ -56,7 +66,7 @@ exports.createTip = async (req, res) => {
         });
         res.redirect('/community/tips');
     } catch (err) {
-        console.error(err);
+        console.error('Error creating tip:', err);
         res.render('community/new-tip', {
             title: 'Share a Health Tip',
             user: req.session.user,
@@ -66,18 +76,22 @@ exports.createTip = async (req, res) => {
     }
 };
 
-// View a single tip with comments
-exports.tipDetail = async (req, res) => {
+// ===== VIEW A SINGLE TIP WITH COMMENTS =====
+const tipDetail = async (req, res) => {
     try {
         const tip = await Tip.findByPk(req.params.id, {
             include: [{ model: User, attributes: ['username'] }]
         });
-        if (!tip) return res.status(404).send('Tip not found');
+        if (!tip) {
+            return res.status(404).send('Tip not found');
+        }
+        
         const comments = await TipComment.findAll({
             where: { tip_id: tip.id },
             include: [{ model: User, attributes: ['username'] }],
-            order: [['createdAt', 'ASC']]
+            order: [['created_at', 'ASC']]
         });
+        
         // Check if user already upvoted
         let userUpvoted = false;
         if (req.session.user) {
@@ -86,6 +100,7 @@ exports.tipDetail = async (req, res) => {
             });
             userUpvoted = !!existing;
         }
+        
         res.render('community/tip-detail', {
             title: tip.title,
             user: req.session.user,
@@ -96,23 +111,29 @@ exports.tipDetail = async (req, res) => {
             success: null
         });
     } catch (err) {
-        console.error(err);
+        console.error('Error loading tip detail:', err);
         res.status(500).send('Error loading tip');
     }
 };
 
-// Upvote a tip
-exports.upvote = async (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
+// ===== UPVOTE A TIP =====
+const upvote = async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
     try {
         const tip = await Tip.findByPk(req.params.id);
-        if (!tip) return res.status(404).send('Tip not found');
+        if (!tip) {
+            return res.status(404).send('Tip not found');
+        }
+        
         // Check if already upvoted
         const existing = await TipUpvote.findOne({
             where: { tip_id: tip.id, user_id: req.session.user.id }
         });
+        
         if (existing) {
-            // Already upvoted – optionally remove upvote (toggle)
+            // Already upvoted – remove upvote (toggle)
             await existing.destroy();
             tip.upvotes = Math.max(0, tip.upvotes - 1);
         } else {
@@ -125,14 +146,16 @@ exports.upvote = async (req, res) => {
         await tip.save();
         res.redirect(`/community/tip/${tip.id}`);
     } catch (err) {
-        console.error(err);
+        console.error('Error upvoting:', err);
         res.status(500).send('Error upvoting');
     }
 };
 
-// Add comment to a tip
-exports.addComment = async (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
+// ===== ADD COMMENT TO A TIP =====
+const addComment = async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
     try {
         const { comment } = req.body;
         if (!comment || comment.length < 2) {
@@ -145,9 +168,17 @@ exports.addComment = async (req, res) => {
         });
         res.redirect(`/community/tip/${req.params.id}`);
     } catch (err) {
-        console.error(err);
+        console.error('Error adding comment:', err);
         res.status(500).send('Error adding comment');
     }
 };
 
-module.exports = { tips, newTipForm, createTip, tipDetail, upvote, addComment };
+// ===== EXPORT ALL =====
+module.exports = { 
+    tips, 
+    newTipForm, 
+    createTip, 
+    tipDetail, 
+    upvote, 
+    addComment 
+};
