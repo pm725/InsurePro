@@ -1,0 +1,59 @@
+<%- include('partials/header', { title: 'File Claim - InsurePro' }) %>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-file-medical text-primary"></i> File a Claim
+                </h3>
+                <p class="text-center text-muted">Submit your insurance claim</p>
+
+                <% if (error) { %>
+                    <div class="alert alert-danger"><%= error %></div>
+                <% } %>
+
+                <% if (success) { %>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> <%= success %>
+                        <div class="text-center mt-3">
+                            <a href="/claims" class="btn btn-primary">
+                                <i class="fas fa-list"></i> View All Claims
+                            </a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <form action="/claim/file" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Claim Description</label>
+                            <textarea class="form-control" id="description" 
+                                      name="description" rows="4" 
+                                      placeholder="Describe your claim in detail..." required></textarea>
+                            <small class="text-muted">Minimum 10 characters</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="document" class="form-label">Supporting Document</label>
+                            <input type="file" class="form-control" id="document" 
+                                   name="document" accept=".jpg,.jpeg,.png,.pdf">
+                            <small class="text-muted">Optional: Upload JPEG, PNG, or PDF (Max 5MB)</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane"></i> Submit Claim
+                        </button>
+                    </form>
+                <% } %>
+
+                <hr class="my-4">
+                <div class="text-center">
+                    <a href="/claims" class="text-decoration-none">
+                        <i class="fas fa-list"></i> View All Your Claims
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
