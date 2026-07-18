@@ -10,7 +10,7 @@
                 <p class="text-center text-muted">Join InsurePro today</p>
 
                 <% if (error) { %>
-                    <div class="alert alert-danger"><%= error %></div>
+                    <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%= error %></div>
                 <% } %>
 
                 <form action="/register" method="POST">

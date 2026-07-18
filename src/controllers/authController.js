@@ -1,46 +1,58 @@
 const User = require('../models/User');
 const RiskProfile = require('../models/RiskProfile');
+const { Op } = require('sequelize');
 
-// Show login page
+// ===== SHOW LOGIN PAGE =====
 exports.showLogin = (req, res) => {
     if (req.session.user) {
         return res.redirect('/dashboard');
     }
     res.render('auth/login', { 
         title: 'Login',
+        user: null,
         error: null,
         success: null
     });
 };
 
-// Process login
+// ===== PROCESS LOGIN =====
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        // Find user
+        // Validate input
+        if (!email || !password) {
+            return res.render('auth/login', {
+                title: 'Login',
+                user: null,
+                error: 'Please fill in all fields',
+                success: null
+            });
+        }
+        
         const user = await User.findOne({ where: { email } });
         
         if (!user) {
             return res.render('auth/login', {
                 title: 'Login',
+                user: null,
                 error: 'Invalid email or password',
                 success: null
             });
         }
         
-        // Validate password
         const isValid = await user.validatePassword(password);
         
         if (!isValid) {
             return res.render('auth/login', {
                 title: 'Login',
+                user: null,
                 error: 'Invalid email or password',
                 success: null
             });
         }
         
-        // Store user in session
+        // Set session
         req.session.user = {
             id: user.id,
             username: user.username,
@@ -50,39 +62,66 @@ exports.login = async (req, res) => {
             smoking: user.smoking
         };
         
-        res.redirect('/dashboard');
+        // ✅ Save session before redirect
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+            }
+            return res.redirect('/dashboard');
+        });
         
     } catch (error) {
-        console.error(error);
+        console.error('Login error:', error);
         res.render('auth/login', {
             title: 'Login',
+            user: null,
             error: 'Something went wrong. Please try again.',
             success: null
         });
     }
 };
 
-// Show register page
+// ===== SHOW REGISTER PAGE =====
 exports.showRegister = (req, res) => {
     if (req.session.user) {
         return res.redirect('/dashboard');
     }
     res.render('auth/register', { 
         title: 'Register',
+        user: null,
         error: null,
         success: null
     });
 };
 
-// Process registration
+// ===== PROCESS REGISTRATION =====
 exports.register = async (req, res) => {
     try {
         const { username, email, password, confirmPassword } = req.body;
         
         // Validate
+        if (!username || !email || !password || !confirmPassword) {
+            return res.render('auth/register', {
+                title: 'Register',
+                user: null,
+                error: 'All fields are required',
+                success: null
+            });
+        }
+        
+        if (password.length < 6) {
+            return res.render('auth/register', {
+                title: 'Register',
+                user: null,
+                error: 'Password must be at least 6 characters',
+                success: null
+            });
+        }
+        
         if (password !== confirmPassword) {
             return res.render('auth/register', {
                 title: 'Register',
+                user: null,
                 error: 'Passwords do not match',
                 success: null
             });
@@ -91,7 +130,7 @@ exports.register = async (req, res) => {
         // Check if user exists
         const existingUser = await User.findOne({ 
             where: { 
-                [require('sequelize').Op.or]: [
+                [Op.or]: [
                     { email },
                     { username }
                 ]
@@ -101,6 +140,7 @@ exports.register = async (req, res) => {
         if (existingUser) {
             return res.render('auth/register', {
                 title: 'Register',
+                user: null,
                 error: 'Username or email already exists',
                 success: null
             });
@@ -108,8 +148,8 @@ exports.register = async (req, res) => {
         
         // Create user
         const user = await User.create({
-            username,
-            email,
+            username: username.trim(),
+            email: email.trim().toLowerCase(),
             password
         });
         
@@ -120,28 +160,35 @@ exports.register = async (req, res) => {
             premium: 50.00
         });
         
+        // ✅ Redirect to login with success
         res.render('auth/login', {
             title: 'Login',
+            user: null,
             error: null,
-            success: 'Registration successful! Please login.'
+            success: '✅ Registration successful! Please login.'
         });
         
     } catch (error) {
-        console.error(error);
+        console.error('Registration error:', error);
         res.render('auth/register', {
             title: 'Register',
+            user: null,
             error: 'Something went wrong. Please try again.',
             success: null
         });
     }
 };
 
-// Logout
+// ===== LOGOUT - FIXED =====
 exports.logout = (req, res) => {
+    // ✅ Destroy session properly
     req.session.destroy((err) => {
         if (err) {
-            console.error(err);
+            console.error('Logout error:', err);
         }
+        // ✅ Clear cookie
+        res.clearCookie('connect.sid');
+        // ✅ Redirect to login
         res.redirect('/login');
     });
 };

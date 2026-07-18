@@ -116,7 +116,7 @@ exports.calculateRisk = async (req, res) => {
     }
 };
 
-// Show dashboard
+// ===== SHOW DASHBOARD =====
 exports.showDashboard = async (req, res) => {
     try {
         if (!req.session.user) {
@@ -126,6 +126,7 @@ exports.showDashboard = async (req, res) => {
         const userId = req.session.user.id;
         const UserModel = require('../models/User');
         const Claim = require('../models/Claim');
+        const RiskProfile = require('../models/RiskProfile');
         
         // Get latest risk profile
         const latestRisk = await RiskProfile.findOne({
@@ -133,7 +134,7 @@ exports.showDashboard = async (req, res) => {
             order: [['createdAt', 'DESC']]
         });
         
-        // Get all risk history for chart
+        // Get risk history for chart
         const riskHistory = await RiskProfile.findAll({
             where: { user_id: userId },
             attributes: ['createdAt', 'risk_score', 'premium'],
@@ -153,9 +154,9 @@ exports.showDashboard = async (req, res) => {
             where: { user_id: userId, status: 'Pending' } 
         });
         
-        // Format data for chart
+        // Format chart data
         const chartData = riskHistory.map(r => ({
-            date: r.createdAt ? r.createdAt.toISOString().split('T')[0] : 'N/A',
+            date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'N/A',
             score: r.risk_score || 0,
             premium: parseFloat(r.premium) || 0
         }));
@@ -173,7 +174,7 @@ exports.showDashboard = async (req, res) => {
         });
         
     } catch (error) {
-        console.error(error);
+        console.error('Dashboard error:', error);
         res.status(500).send('Error loading dashboard');
     }
 };
