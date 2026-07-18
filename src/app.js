@@ -12,6 +12,7 @@ const riskRoutes = require('./routes/riskRoutes');
 const claimRoutes = require('./routes/claimRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+const communityRoutes = require('./routes/communityRoutes');
 
 // View engine
 app.set('view engine', 'ejs');
@@ -23,8 +24,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/', adminRoutes);
 app.use('/', quizRoutes);
+app.use('/', communityRoutes);
 
-// ✅ ADD THIS LINE - Serve uploaded files
+
 app.use('/uploads', express.static('uploads'));
 
 // Create uploads directory if it doesn't exist
