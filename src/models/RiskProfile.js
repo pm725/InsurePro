@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./User');
+
 
 const RiskProfile = sequelize.define('RiskProfile', {
     id: {
@@ -35,5 +37,6 @@ const RiskProfile = sequelize.define('RiskProfile', {
     tableName: 'risk_profiles',
     timestamps: true
 });
+RiskProfile.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = RiskProfile;

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-
+const User = require('./User');
 const QuizResult = sequelize.define('QuizResult', {
     id: {
         type: DataTypes.INTEGER,
@@ -29,5 +29,6 @@ const QuizResult = sequelize.define('QuizResult', {
     createdAt: false,
     updatedAt: false
 });
+QuizResult.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = QuizResult;

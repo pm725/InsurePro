@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./User');
+
 
 const TipUpvote = sequelize.define('TipUpvote', {
     id: {
@@ -21,5 +23,5 @@ const TipUpvote = sequelize.define('TipUpvote', {
     createdAt: 'created_at',
     updatedAt: false
 });
-
+TipUpvote.belongsTo(User, { foreignKey: 'user_id' });
 module.exports = TipUpvote;
