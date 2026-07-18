@@ -34,12 +34,32 @@ const isAdmin = async (req, res, next) => {
         }
         
         console.log('❌ Access denied for:', user.email);
-        return res.status(403).render('error', {
-            title: 'Access Denied',
-            user: req.session.user,
-            message: 'You do not have admin privileges.',
-            error: 'Only administrators can access this page.'
-        });
+        // ✅ FIXED: Simple HTML instead of error view
+        return res.status(403).send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Access Denied</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>
+                    body { background: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+                    .card { max-width: 500px; text-align: center; padding: 40px; border: 2px solid #dc3545; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); background: white; }
+                    .card i { font-size: 4rem; color: #dc3545; margin-bottom: 20px; }
+                    .card h2 { color: #dc3545; }
+                    .card .text-muted { color: #6c757d; }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <i class="fas fa-lock"></i>
+                    <h2>Access Denied</h2>
+                    <p class="text-muted">Only administrators can access this page.</p>
+                    <a href="/dashboard" class="btn btn-danger">Go to Dashboard</a>
+                </div>
+            </body>
+            </html>
+        `);
     } catch (err) {
         console.error('❌ Admin check error:', err);
         res.status(500).send('Error checking admin status');
@@ -186,7 +206,7 @@ const claims = async (req, res) => {
 const updateClaim = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body; // 'Approved' or 'Rejected'
+        const { status } = req.body;
         
         const claim = await Claim.findByPk(id);
         if (!claim) {

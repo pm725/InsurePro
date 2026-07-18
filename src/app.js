@@ -44,14 +44,13 @@ app.use((req, res, next) => {
 });
 
 // ===== ROUTES =====
-app.use('/', authRoutes);
-app.use('/', riskRoutes);
-app.use('/', claimRoutes);
-app.use('/', adminRoutes);
-app.use('/', quizRoutes);
-app.use('/', communityRoutes);
-app.use('/', infoRoutes);
-
+app.use('/', authRoutes);        // Login, Register, Logout
+app.use('/', riskRoutes);        // Dashboard, Risk Calculator
+app.use('/', claimRoutes);       // Claims
+app.use('/', quizRoutes);        // Health Quiz
+app.use('/', communityRoutes);   // Community
+app.use('/', infoRoutes);        // Learn
+app.use('/', adminRoutes);       // Admin
 // ===== HOMEPAGE =====
 app.get('/', (req, res) => {
     if (req.session?.user) {
