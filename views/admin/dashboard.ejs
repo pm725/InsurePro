@@ -3,6 +3,7 @@
 <h2><i class="fas fa-crown text-warning"></i> Admin Dashboard</h2>
 <p class="text-muted">Overview of InsurePro platform</p>
 
+<!-- Stats Cards -->
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="card text-white bg-primary">
@@ -17,6 +18,7 @@
             <div class="card-body">
                 <h6>Total Claims</h6>
                 <h2><%= totalClaims %></h2>
+                <small>Approved: <%= approvedClaims %> | Rejected: <%= rejectedClaims %></small>
             </div>
         </div>
     </div>
@@ -25,14 +27,16 @@
             <div class="card-body">
                 <h6>Pending Claims</h6>
                 <h2><%= pendingClaims %></h2>
+                <small>Needs review</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card text-white bg-danger">
             <div class="card-body">
-                <h6>Avg Risk Score</h6>
-                <h2><%= avgRisk.toFixed(1) %></h2>
+                <h6>Quiz Results</h6>
+                <h2><%= totalQuizzes %></h2>
+                <small>Avg Health: <%= avgHealth %>%</small>
             </div>
         </div>
     </div>
@@ -45,7 +49,10 @@
             <div class="card-body">
                 <ul class="list-group">
                     <% recentUsers.forEach(u => { %>
-                        <li class="list-group-item"><%= u.username %> (<%= u.email %>)</li>
+                        <li class="list-group-item">
+                            <a href="/admin/user/<%= u.id %>"><%= u.username %></a> 
+                            (<%= u.email %>)
+                        </li>
                     <% }) %>
                 </ul>
             </div>
@@ -57,7 +64,34 @@
             <div class="card-body">
                 <ul class="list-group">
                     <% recentClaims.forEach(c => { %>
-                        <li class="list-group-item">#<%= c.id %> - <%= c.status %> (<%= c.createdAt.toLocaleDateString() %>)</li>
+                        <li class="list-group-item">
+                            #<%= c.id %> - <%= c.User ? c.User.username : 'Unknown' %> 
+                            <span class="badge <%= c.status === 'Approved' ? 'bg-success' : 
+                                c.status === 'Rejected' ? 'bg-danger' : 'bg-warning' %>">
+                                <%= c.status %>
+                            </span>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">Recent Quiz Results</div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <% recentQuizzes.forEach(q => { %>
+                        <li class="list-group-item">
+                            <%= q.User ? q.User.username : 'Unknown' %> 
+                            - Score: <span class="badge <%= q.health_score >= 80 ? 'bg-success' : 
+                                q.health_score >= 60 ? 'bg-warning' : 'bg-danger' %>">
+                                <%= q.health_score %>% 
+                            </span>
+                        </li>
                     <% }) %>
                 </ul>
             </div>

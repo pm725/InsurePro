@@ -1,0 +1,99 @@
+<%- include('../partials/header', { title: 'User Details' }) %>
+
+<h2><i class="fas fa-user text-danger"></i> User: <%= targetUser.username %></h2>
+<p class="text-muted"><%= targetUser.email %></p>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Profile</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Username:</strong> <%= targetUser.username %></li>
+                    <li class="list-group-item"><strong>Email:</strong> <%= targetUser.email %></li>
+                    <li class="list-group-item"><strong>Age:</strong> <%= targetUser.age || 'Not set' %></li>
+                    <li class="list-group-item"><strong>BMI:</strong> <%= targetUser.bmi || 'Not set' %></li>
+                    <li class="list-group-item"><strong>Smoking:</strong> <%= targetUser.smoking ? 'Yes' : 'No' %></li>
+                    <li class="list-group-item"><strong>Joined:</strong> <%= new Date(targetUser.createdAt).toLocaleDateString() %></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Risk History</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>Date</th><th>Risk Score</th><th>Premium</th></tr>
+                    </thead>
+                    <tbody>
+                        <% riskProfiles.forEach(r => { %>
+                            <tr>
+                                <td><%= new Date(r.createdAt).toLocaleDateString() %></td>
+                                <td><%= r.risk_score %></td>
+                                <td>$<%= r.premium %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Claims</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>ID</th><th>Status</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        <% userClaims.forEach(c => { %>
+                            <tr>
+                                <td>#<%= c.id %></td>
+                                <td><span class="badge <%= c.status === 'Approved' ? 'bg-success' : 
+                                    c.status === 'Rejected' ? 'bg-danger' : 'bg-warning' %>">
+                                    <%= c.status %>
+                                </span></td>
+                                <td><%= new Date(c.createdAt).toLocaleDateString() %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Quiz Results</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>Score</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        <% quizResults.forEach(q => { %>
+                            <tr>
+                                <td>
+                                    <span class="badge <%= q.health_score >= 80 ? 'bg-success' : 
+                                        q.health_score >= 60 ? 'bg-warning' : 'bg-danger' %>">
+                                        <%= q.health_score %>%
+                                    </span>
+                                </td>
+                                <td><%= new Date(q.completed_at).toLocaleDateString() %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="/admin/dashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>
+
+<%- include('../partials/footer') %>
