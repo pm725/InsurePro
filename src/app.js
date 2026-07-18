@@ -20,6 +20,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// ✅ ADD THIS LINE - Serve uploaded files
+app.use('/uploads', express.static('uploads'));
+
 // Create uploads directory if it doesn't exist
 const fs = require('fs');
 if (!fs.existsSync('uploads')) {
@@ -54,13 +57,15 @@ app.get('/', (req, res) => {
     }
     res.render('index', { 
         title: 'InsurePro - Smart Health Insurance',
-        user: null
+        user: null,
+        error: null,
+        success: null
     });
 });
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`InsurePro running on http://localhost:${PORT}`);
-    console.log(` Dashboard: http://localhost:${PORT}/dashboard`);
-    console.log(` Login: http://localhost:${PORT}/login`);
+    console.log(`🚀 InsurePro running on http://localhost:${PORT}`);
+    console.log(`📊 Dashboard: http://localhost:${PORT}/dashboard`);
+    console.log(`🔐 Login: http://localhost:${PORT}/login`);
 });
