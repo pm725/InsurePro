@@ -1,0 +1,28 @@
+<%- include('../partials/header', { title: 'Quiz Question' }) %>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                Question <%= step + 1 %> of <%= total %>
+            </div>
+            <div class="card-body">
+                <h5><%= question.question %></h5>
+                <form action="/quiz/answer" method="POST">
+                    <input type="hidden" name="step" value="<%= step %>">
+                    <% question.options.forEach((opt, idx) => { %>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="answer" value="<%= idx %>" id="opt<%= idx %>" required>
+                            <label class="form-check-label" for="opt<%= idx %>"><%= opt %></label>
+                        </div>
+                    <% }) %>
+                    <button type="submit" class="btn btn-primary mt-3">
+                        <%= step + 1 === total ? 'Finish' : 'Next' %>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
