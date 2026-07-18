@@ -53,7 +53,7 @@ exports.fileClaim = async (req, res) => {
         });
         
     } catch (error) {
-        console.error(error);
+        console.error('Claim error:', error);
         res.render('claim-form', {
             title: 'File a Claim',
             user: req.session.user,
@@ -79,11 +79,19 @@ exports.viewClaims = async (req, res) => {
         res.render('claims', {
             title: 'My Claims',
             user: req.session.user,
-            claims: allClaims
+            claims: allClaims || [],
+            error: null,
+            success: null
         });
         
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error loading claims');
+        res.render('claims', {
+            title: 'My Claims',
+            user: req.session.user,
+            claims: [],
+            error: 'Error loading claims. Please try again.',
+            success: null
+        });
     }
 };
