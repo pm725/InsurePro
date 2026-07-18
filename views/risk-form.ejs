@@ -9,8 +9,14 @@
                 </h3>
                 <p class="text-center text-muted">Calculate your health risk score and premium estimate</p>
 
-                <% if (error) { %>
+                <!-- ✅ Check if error exists -->
+                <% if (typeof error !== 'undefined' && error) { %>
                     <div class="alert alert-danger"><%= error %></div>
+                <% } %>
+
+                <!-- ✅ Check if success exists -->
+                <% if (typeof success !== 'undefined' && success) { %>
+                    <div class="alert alert-success"><%= success %></div>
                 <% } %>
 
                 <% if (result) { %>
