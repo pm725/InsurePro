@@ -49,6 +49,70 @@ Nepal is among the **top 10 most climate-vulnerable countries** globally, with *
 ### APIs & Integration
 - **OpenWeatherMap API** for weather data
 - **wttr.in** (free alternative)
-- **Twilio** for SMS (optional)
+
 
 ## 📊 System Architecture
+┌─────────────────────────────────────────────────────────────┐
+│ KrishiMitra System │
+├─────────────────────────────────────────────────────────────┤
+│ │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │ React │ │ FastAPI │ │ PostgreSQL │ │
+│ │ Frontend │◄──►│ Backend │◄──►│ Database │ │
+│ │ (Vite) │ │ (Python) │ │ │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ │
+│ │ │ │ │
+│ ▼ ▼ ▼ │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │ Chart.js │ │ Weather │ │ Twilio │ │
+│ │ Analytics │ │ APIs │ │ SMS │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ │
+│ │
+└─────────────────────────────────────────────────────────────┘
+## 📁 Project Structure
+krishimitra/
+├── backend/
+│ ├── app/
+│ │ ├── main.py # FastAPI application
+│ │ ├── database.py # PostgreSQL connection
+│ │ ├── models.py # SQLAlchemy models
+│ │ ├── services/
+│ │ │ ├── weather_service.py
+│ │ │ ├── advisory_service.py
+│ │ │ └── sms_service.py
+│ │ └── utils/
+│ ├── requirements.txt
+│ └── .env
+├── frontend/
+│ ├── src/
+│ │ ├── components/
+│ │ │ ├── Dashboard.jsx
+│ │ │ ├── Analytics.jsx
+│ │ │ └── LanguageSwitcher.jsx
+│ │ ├── i18n/
+│ │ │ └── index.js
+│ │ ├── App.jsx
+│ │ └── main.jsx
+│ ├── package.json
+│ └── tailwind.config.js
+├── ml_models/
+│ └── weather_prediction_xgboost.py
+├── database/
+│ └── schema.sql
+├── docker-compose.yml
+├── .env
+└── README.md
+
+
+🌐 API Endpoints
+Method	Endpoint	Description
+GET	/	API information
+GET	/health	Health check
+POST	/api/weather/free	Get weather (free, no key)
+POST	/api/weather/current	Get weather (OpenWeather)
+POST	/api/advisory/generate	Generate farming advice
+POST	/api/farmers/register	Register a farmer
+GET	/api/farmers/list	List all farmers
+
+🤝 Contributing
+Contributions are welcome! Please feel free to submit a Pull Request
